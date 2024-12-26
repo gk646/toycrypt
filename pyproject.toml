@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "toycrypt"
+version = "0.0.1"
+description = "A description of your project"
+readme = "README.md"
+license = {text = "zlib"}
+authors = [{name = "gk646", email = "gk646@proton.me"}]
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["toycrypt"]

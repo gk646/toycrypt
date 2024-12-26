@@ -1,0 +1,4 @@
+dist
+.idea
+*.txt
+toycrypt/toycrypt.egg-info
