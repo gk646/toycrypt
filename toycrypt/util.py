@@ -1,3 +1,7 @@
+import threading
+import time
+
+
 def xor(a: int, b: int) -> int:
     """
     Returns the result of the XOR operation applied to every bit of both numbers
@@ -70,34 +74,9 @@ def decode16(base16_string: str) -> int:
     return output
 
 
-def encode16_str(input_string: str) -> str:
-    """
-    Encodes the given input string to base16 (hexadecimal) representation
-    :param input_string: a string of any length
-    :return: the base16 representation of the input string
-    """
-    output = ""  # Start with the empty string
-
-    # Each byte of the input is split into two 4 bit values (0-16)
-    # Then transferred to its character representation
-
-    def get_base_16char(number: int) -> str:
-        if number < 10:  # 0 - 9 stays the same
-            return str(number)
-        return chr(ord('a') + (number - 10))
-
-    for byte in input_string:
-        byte_num = ord(byte)  # Convert byte to a number (32 bit)
-
-        # Only look at the first 8 bits - split it into two 4 bit chunks
-        # Extract the first 4 bits of the 8 bits (high nibble) - shift them to the left and zero everything else
-        first_bits = (byte_num >> 4) & 0b00001111
-        # Extract the last 4 bits - already in the correct position (low nibble) - zero everything else
-        second_bits = byte_num & 0b00001111
-
-        # Convert both 4-bit chunks to their hexadecimal representation
-        output += get_base_16char(first_bits)
-        output += get_base_16char(second_bits)
-    return output
-
-
+def measure(function, *args, **kwargs):
+    start_time = time.time()
+    result = function(*args, **kwargs)
+    end_time = time.time()
+    print(f"Took {end_time - start_time}")
+    return result
