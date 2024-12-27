@@ -1,4 +1,3 @@
-import threading
 import time
 
 
@@ -75,6 +74,13 @@ def decode16(base16_string: str) -> int:
 
 
 def measure(function, *args, **kwargs):
+    """
+    Measures the time it takes to complete the given method with the given arguments
+    :param function: any function that is called
+    :param args: function arguments in correct order
+    :param kwargs: keyword arguments that can be in any order (e.g. input1="Hello")
+    :return: result of the function call
+    """
     start_time = time.time()
     result = function(*args, **kwargs)
     end_time = time.time()
