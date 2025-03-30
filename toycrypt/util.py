@@ -1,4 +1,6 @@
+import math
 import time
+import toymath
 
 
 def xor(a: int, b: int) -> int:
@@ -86,3 +88,57 @@ def measure(function, *args, **kwargs):
     end_time = time.time()
     print(f"Took {end_time - start_time}")
     return result
+
+
+def geometric_progression(g: int, sequence: str) -> int:
+    """Returns the numeric value of the sequence with the given base g. Only works for 1 <= g < 36"""
+    if g == 0:
+        return 1
+    k = len(sequence)
+    result: int = 0
+    for i, c in enumerate(sequence, 1):
+        a = int(c, g)
+        if a > g or a >= 26:
+            raise ValueError
+        result += a * pow(g, k - i)
+    return result
+
+
+def geometric_progression_rev(g: int, number: int) -> str:
+    """Returns string representation of the number in the given base. Only works for 1 <= g < 36"""
+    if g == 0:
+        raise ValueError
+
+    if number == 0:
+        return "0"
+
+    result: str = ""
+
+    if g == 1:
+        for i in range(number):
+            result += "1"
+        return result
+
+    digits = "0123456789abcdefghijklmnopqrstuvwxyz"
+
+    while number > 0:
+        q, r = toymath.modulo(number, g)
+        result += digits[r]
+        number //= g
+    return ''.join(reversed(result))
+
+
+def binary2decimal(binary: str) -> int:
+    return geometric_progression(2, binary)
+
+
+def decimal2binary(decimal: int) -> str:
+    return geometric_progression_rev(2, decimal)
+
+
+def hex2decimal(hexa: str) -> int:
+    return geometric_progression(16, hexa)
+
+
+def decimal2hex(decimal: int) -> str:
+    return geometric_progression_rev(16, decimal)
