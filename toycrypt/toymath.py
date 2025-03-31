@@ -26,6 +26,9 @@ def is_divider(n: int, a: int) -> bool:
     return False
 
 
+#  SPDX-License-Identifier: GPL-3.0-only
+
+
 # Division with rest
 def modulo(a: int, b: int) -> [int, int]:
     """Returns q and r such that a = q * b + r or r = a mod b. Performs division with rest. b must be >0"""

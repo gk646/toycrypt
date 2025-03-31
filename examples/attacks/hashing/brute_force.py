@@ -1,3 +1,5 @@
+#  SPDX-License-Identifier: GPL-3.0-only
+
 # Brute Force Attack
 # Topics: Hashing, Passwords
 

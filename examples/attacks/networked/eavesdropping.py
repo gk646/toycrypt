@@ -1,3 +1,5 @@
+#  SPDX-License-Identifier: GPL-3.0-only
+
 # Eavesdropping
 
 # Eavesdropping is the act of secretly or stealthily listening to the private conversation or communications of others.
