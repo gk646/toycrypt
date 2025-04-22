@@ -1,8 +1,32 @@
 #  SPDX-License-Identifier: GPL-3.0-only
 
-# Encryption
+import random
+from typing import overload
+from util import xor, encode_base16, decode_base16
 
-from util import xor
+
+class Key:
+    _number: int
+    _string: str
+
+    def __init__(self, number: int):
+        self._number = number
+        self._string = encode_base16(number)
+
+
+def key_from_string(string: str) -> Key:
+    key = Key(decode_base16(string))
+    key._string = string
+    return key
+
+
+class KeyPair:
+    _public: Key
+    _private: Key
+
+    def __init__(self, private: Key, public: Key):
+        self._private = private
+        self._public = public
 
 
 def encrypt_xor(input_string: str, secret_key: int, key_bytes: int = 4) -> str:
@@ -36,3 +60,9 @@ def decrypt_xor(cipher_text: str, secret_key: int, key_length: int = 4) -> str:
     # xor encryption has a few special properties
     #       - symmetrical: applying
     return encrypt_xor(cipher_text, secret_key, key_length)
+
+
+def generate_keypair(p: int, g: int) -> KeyPair:
+    secret_key: int = random.randint(0, 0xFFFFFFFF)  # Random value between 0 and 32-bit unsigned max
+    public_key: int = pow(g, secret_key, p)  # Uses optimized modulo exponentiation
+    return KeyPair(Key(secret_key), Key(public_key))

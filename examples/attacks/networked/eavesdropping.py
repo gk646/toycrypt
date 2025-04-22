@@ -11,6 +11,14 @@
 
 from toycrypt.simulation import *
 
+# Note: the internet is always a public connection as you cant rely on anything
+internet = Connection()
+
+# Any communication can have a third pary (an eavesdropper) connected as well
+eve = Device("Eve")
+internet.add_listener(eve)
+
+# Alice and Bob now want to send messages to each other
 alice = Device("Alice")
 bob = Device("Bob")
 internet = Connection()  # Note: the internet is always a public connection as you cant rely on anything
@@ -19,13 +27,17 @@ internet = Connection()  # Note: the internet is always a public connection as y
 alice.connect(internet)
 bob.connect(internet)
 
-# Now a third actor (an eavesdropper) connects as well
-oscar = Device("Oscar")
-internet.add_listener(oscar)
-
-# Now when alice and bob talk, oscar can see the messages as well
+# Now when alice and bob talk, eve can see the messages as well
 alice.send(bob, "Hello Bob")
 bob.send(alice, "Hello Alice")
 
-for message in oscar.get_received_messages():
+for message in eve.get_received_messages():
     print(message)
+
+# Now Alice and Bob decide to encrypt their traffic
+# But first they have to
+
+
+# To combat sharing the key over the public channel you can use Diffie-Hellman key exchange.
+# https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
+# It works by

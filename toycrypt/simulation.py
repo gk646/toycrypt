@@ -58,10 +58,6 @@ class Connection:
         for listener in self._listeners:
             listener.get_received_messages().append(message)
 
-    def broadcast(self, message: Message):
-        for listener in self._listeners:
-            listener.get_received_messages().append(message)
-
 
 class Device:
     """
@@ -81,7 +77,6 @@ class Device:
     def connect(self, connection: Connection):
         self._connection = connection
         self._connection.add_client(self)
-        self._connection.broadcast(Message(self, self, f"{self._name} connected"))
 
     def send(self, target: "Device", content: str):
         if self._connection is None:

@@ -1,3 +1,7 @@
+#  SPDX-License-Identifier: GPL-3.0-only
+import math
+
+
 def round_down(num: float) -> float:
     """Returns the greatest whole number, smaller or equal to num
      Gaussian square bracket; [num]
@@ -10,6 +14,7 @@ def round_down(num: float) -> float:
 
 def is_divider(n: int, a: int) -> bool:
     """Checks if a divides n. This means n is dividable by a. Uses naive approach"""
+    n = abs(n)
     if n == 0:
         return True
     if a == 0:  # if a == 0 then 0 * b = n only holds for n == 0 as any b multiplied with 0 must be 0 (in real numbers)
@@ -26,16 +31,13 @@ def is_divider(n: int, a: int) -> bool:
     return False
 
 
-#  SPDX-License-Identifier: GPL-3.0-only
-
-
 # Division with rest
-def modulo(a: int, b: int) -> [int, int]:
-    """Returns q and r such that a = q * b + r or r = a mod b. Performs division with rest. b must be >0"""
-    if b == 0:
+def modulo(a: int, n: int) -> [int, int]:
+    """Returns q and r such that a = q * n + r or r = a mod n. Performs division with rest. n must be >0"""
+    if n == 0:
         return [None, None]
-    q = round_down(float(a) / float(b))  # q = [a/b]
-    r = a - b * q
+    q = round_down(float(a) / float(n))  # q = [a/n]
+    r = a - n * q
     return [q, r]
 
 
@@ -66,6 +68,13 @@ def gcd_ex(a: int, b: int) -> [int, [int]]:
         curr_a = curr_b
         curr_b = r
     return curr_b, quotients
+
+
+def get_least_positive_residue(a: int, n: int) -> int:
+    """Returns the least positive element in the same residue as the given a in modulo n"""
+    a = abs(a)  # Make it positive
+    q, r = modulo(a, n)  # Make it smaller than n
+    return n - r  # Returns the least positive element
 
 
 def lcm(a: int, b: int) -> int:
@@ -109,7 +118,7 @@ class Matrix2x2:
         return Matrix2x2(1, 0, 0, 1)
 
     @staticmethod
-    def euclideanQ(q: int):
+    def eec_Q(q: int):
         return Matrix2x2(q, 1, 1, 0)
 
 
@@ -117,12 +126,115 @@ class Matrix2x2:
 def eec(a: int, b: int) -> [int, int]:
     """Returns the coefficients x and y such that the linear combination gcd(a,b) = a*x + b*y holds"""
     divisor, quotients = gcd_ex(a, b)
-    result: Matrix2x2 = Matrix2x2.euclideanQ(quotients[0])
+    result: Matrix2x2 = Matrix2x2.eec_Q(quotients[0])
     for i in range(1, len(quotients)):
-        result = result * Matrix2x2.euclideanQ(quotients[i])
+        result = result * Matrix2x2.eec_Q(quotients[i])
 
     x = pow(-1, len(quotients)) * result.a22
     y = pow(-1, len(quotients) - 1) * result.a12
 
     return x, y
+
+
+def is_modulo_congruent(a: int, b: int, n: int) -> bool:
+    """Returns boolean if a and b are in the same residue when modulo n. Only works for n >= 2"""
+    if n < 2:
+        return False
+    # Alternative: congruence holds if n divides a - b
+    # return is_divider(a - b, n)
+
+    # Naive approach just compare the rest
+    aq, ar = modulo(a, n)
+    bq, br = modulo(b, n)
+    return ar == br
+
+
+def table_to_str(table: [[int]], mode="add") -> str:
+    """
+    Returns a printable string of the given table.
+    :param mode either add or mult"""
+    if mode == "add":
+        ret = "|+|"
+    elif mode == "mult":
+        ret = "|*|"
+    else:
+        raise ValueError("Invalid mode")
+
+    n: int = len(table)
+    for i in range(n):
+        ret += f"|{i}"
+    ret += "|\n"
+
+    for i in range(n):
+        ret += f"|{i}|"
+        for j in range(n):
+            ret += f" {table[i][j]}"
+        ret += "|\n"
+    return ret
+
+
+def get_add_table(n: int) -> [[int]]:
+    """Returns a numeric table of the addition table of the given n."""
+    ret: [[int]] = []
+    for i in range(n):
+        ret.append([])
+        for j in range(n):
+            ret[i].append(modulo(i + j, n)[1])
+    return ret
+
+
+def get_mult_table(n: int) -> [[int]]:
+    """Returns a numeric table of the addition table of the given n."""
+    ret: [[int]] = []
+    for i in range(n):
+        ret.append([])
+        for j in range(n):
+            ret[i].append(modulo(i * j, n)[1])
+    return ret
+
+
+def has_mult_inverse(a: int, n: int) -> bool:
+    """Returns true if, given a number a ∈ {1,...,n-1} and a modulo n,
+    there exists a multiplicative inverse a-1 such that a * a-1 congruent 1 mod n.
+    This holds if a and n are co-prime to each other. """
+    return gcd(a, n) == 1
+
+
+def get_multi_inverse(a: int, n: int) -> int:
+    if not has_mult_inverse(a, n):
+        raise ValueError("a is not co-prime to n")
+    fa, fb = eec(n, a)
+    return get_least_positive_residue(fb, n)
+
+
+def pow_naive(x: int, y: int) -> int:
+    """Returns x to the power of y"""
+    if y == 0:
+        return 1
+    if y < 0:
+        raise ValueError("Only positive exponents")
+    ret = 1
+    # This approach takes y many multiplications
+    # Thus has complexity O(n)
+    for i in range(y):
+        ret *= x
+    return ret
+
+
+def pow_mult_sqr(x: int, y: int) -> int:
+    if y == 0:
+        return 1
+    if y < 0:
+        raise ValueError("Only positive exponents")
+    result: int = 1
+    base = x
+    exp = y
+    # This approach uses at most 2 * log2(y) multiplications
+    # Thus has complexity O(log2(n))
+    while exp > 0:
+        if exp & 1:
+            result *= base
+        base *= base
+        exp >>= 1
+    return result
 
