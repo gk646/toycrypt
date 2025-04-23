@@ -1,7 +1,7 @@
 #  SPDX-License-Identifier: GPL-3.0-only
 
 import time
-import toymath
+from toycrypt import toymath
 
 
 def xor(a: int, b: int) -> int:
@@ -81,8 +81,12 @@ def decimal2binary(decimal: int) -> str:
 
 
 def hex2decimal(hexa: str) -> int:
-    return geometric_progression(16, hexa)
+    if len(hexa) < 3:
+        raise ValueError("Invalid hexa string")
+    return geometric_progression(16, hexa.removeprefix("0x"))
 
 
 def decimal2hex(decimal: int) -> str:
-    return geometric_progression_rev(16, decimal)
+    return "0x" + geometric_progression_rev(16, decimal)
+
+

@@ -238,3 +238,45 @@ def pow_mult_sqr(x: int, y: int) -> int:
         exp >>= 1
     return result
 
+
+def get_residue_set(n: int) -> [int]:
+    """Returns the residue set of the given modulo n. {0, ..., n-1}"""
+    return [i for i in range(n)]
+
+
+def get_reduced_residue_set(n: int) -> [int]:
+    """Returns the reduced residue set of the given modulo n, such that all elements are co-prime to n."""
+    ret: [int] = []
+    for i in range(n):
+        if gcd(i, n) == 1:
+            ret.append(i)
+    return ret
+
+
+def euler_phi(n: int) -> int:
+    """Applies the euler phi function to n."""
+    ret: int = 0
+    for i in range(n):
+        if gcd(i, n) == 1:
+            ret += 1
+    return ret
+
+
+def little_fermat(a: int, p: int) -> bool:
+    """Returns true if for a given a and p, a**(p1) congruent to 1 mod p holds. """
+    if euler_phi(p) != p - 1 or gcd(a, p) != 1:
+        return False  # p is not a prime or a is not co-prime to p
+    return pow(a, p - 1, p) == 1
+
+
+def euler_fermat(residue: [int], n: int) -> bool:
+    """Returns true if the given residue set is a reduced set and satisfies the euler-fermat theorem: all members are co-prime to n, and a**phi(n) congruent to 1 mod n holds."""
+    phi = euler_phi(n)
+    for a in residue:
+        if gcd(a, n) != 1:
+            return False
+        if pow(a, phi, n) != 0:
+            return False
+    return True
+
+

@@ -26,7 +26,7 @@ class Hash:
 
     def __init__(self, number: int):
         self.number = number
-        self.string = encode16(number)
+        self.string = decimal2hex(number)
 
     def __str__(self):
         return f"Hash:{self.string}"

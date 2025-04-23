@@ -1,23 +1,17 @@
 #  SPDX-License-Identifier: GPL-3.0-only
 
-import random
-from typing import overload
-from util import xor, encode_base16, decode_base16
+from toycrypt import toymath
+from util import xor, decimal2hex, hex2decimal
 
 
 class Key:
     _number: int
-    _string: str
 
     def __init__(self, number: int):
         self._number = number
-        self._string = encode_base16(number)
 
-
-def key_from_string(string: str) -> Key:
-    key = Key(decode_base16(string))
-    key._string = string
-    return key
+    def __str__(self):
+        return decimal2hex(self._number)
 
 
 class KeyPair:
@@ -27,6 +21,9 @@ class KeyPair:
     def __init__(self, private: Key, public: Key):
         self._private = private
         self._public = public
+
+    def __str__(self):
+        return f"Private:{self._private} / Public:{self._public}"
 
 
 def encrypt_xor(input_string: str, secret_key: int, key_bytes: int = 4) -> str:
@@ -62,7 +59,12 @@ def decrypt_xor(cipher_text: str, secret_key: int, key_length: int = 4) -> str:
     return encrypt_xor(cipher_text, secret_key, key_length)
 
 
-def generate_keypair(p: int, g: int) -> KeyPair:
-    secret_key: int = random.randint(0, 0xFFFFFFFF)  # Random value between 0 and 32-bit unsigned max
-    public_key: int = pow(g, secret_key, p)  # Uses optimized modulo exponentiation
-    return KeyPair(Key(secret_key), Key(public_key))
+def diffie_hellman_private(p: int, g: int, secret: int) -> Key:
+    q, r = toymath.modulo(pow(g, secret), p)
+    # Note: this is NOT a key in the sens of public key cryptography
+    return Key(r)
+
+
+def diffie_hellman_exchange(p: int, g: int, secret: int, other: Key) -> Key:
+    shared_secret = pow(other._number, secret, p)
+    return Key(shared_secret)

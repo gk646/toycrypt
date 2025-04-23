@@ -6,10 +6,8 @@
 # Often without their consent in order to gather information.
 # (Wikipedia)
 
-#
-
-
-from toycrypt.simulation import *
+from toycrypt.crypto import diffie_hellman_private, diffie_hellman_exchange
+from toycrypt.simulation import Connection, Device
 
 # Note: the internet is always a public connection as you cant rely on anything
 internet = Connection()
@@ -40,4 +38,17 @@ for message in eve.get_received_messages():
 
 # To combat sharing the key over the public channel you can use Diffie-Hellman key exchange.
 # https://en.wikipedia.org/wiki/Diffie%E2%80%93Hellman_key_exchange
-# It works by
+
+p, g = 23, 5
+
+alice = diffie_hellman_private(p, g, 4)
+bob = diffie_hellman_private(p, g, 3)
+
+print(alice)
+print(bob)
+
+alice_secret = diffie_hellman_exchange(p, g, 4, bob)
+bob_secret = diffie_hellman_exchange(p, g, 3, alice)
+
+print(alice_secret)
+print(bob_secret)
